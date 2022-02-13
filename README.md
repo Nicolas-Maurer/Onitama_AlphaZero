@@ -5,9 +5,10 @@ Implementation of the AlphaZero algorithm for the game Onitama
 
 # Onitama 
 Onitama is a 2-player board game of size 5x5. 
-At the beginning of each game, the players have 4 pawns, a king and they draw to cards each; Another card is added on the side of the board.
-
+Each player starts the game with 5 pieces: 4 pawn and a king, and with 2 cards, another card is added near the board. 
 The goal of the game is to kill the opponent's king, or to reach your opponent's king starting point.
+
+The player can move their pieces according to the 2 cards in front of them, once a move from a card is played, the card is exchanged with the one near the board. 
 
 # AlphaZero
 
