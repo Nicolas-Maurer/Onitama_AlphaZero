@@ -17,5 +17,7 @@ My goal is to implement the AlphaZero algorithm for Onitama; following the amazi
 https://arxiv.org/pdf/1712.01815.pdf  
 
 
+# Neural Network
 
+# Monte Carlo Tree Search (MCTS)
 
