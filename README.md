@@ -19,5 +19,7 @@ https://arxiv.org/pdf/1712.01815.pdf
 
 # Neural Network
 
+Input_dim = 5 x 5 x 10
+Output_dim = 5 x 5 x 52
 # Monte Carlo Tree Search (MCTS)
 
