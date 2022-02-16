@@ -21,5 +21,6 @@ https://arxiv.org/pdf/1712.01815.pdf
 
 Input_dim = 5 x 5 x 10
 Output_dim = 5 x 5 x 52
-# Monte Carlo Tree Search (MCTS)
 
+# Monte Carlo Tree Search (MCTS)
+In the paper, they 800 simulations for each MCTS, and the trees were kept for the whole game.
