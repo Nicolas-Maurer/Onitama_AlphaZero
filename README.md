@@ -22,7 +22,7 @@ https://arxiv.org/pdf/1712.01815.pdf
 We will represent the board by a 5x5 matrix. 
 In the input, we need to have the information of which piece is where, as well as the card in the player hands and the one on the side
 
-The output dimension correspond to all the possibles moves. 
+The output dimension correspond to all the possibles moves.   
 Input_dim = 5 x 5 x 10   
 Output_dim = 5 x 5 x 52  
 
