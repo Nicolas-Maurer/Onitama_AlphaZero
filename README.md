@@ -7,7 +7,8 @@ Implementation of the AlphaZero algorithm for the game Onitama
 
 For more details about this project, feel free to read my articles !   
 - Part 1: https://medium.com/@nicolasmaurer/part-1-alphazero-implementation-for-the-game-onitama-370afb1259e6
-
+- Part 2: Soon
+- Part 3: Soon
 
 # Onitama 
 Onitama is a 2-player board game of size 5x5. 
