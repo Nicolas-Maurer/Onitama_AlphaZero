@@ -39,9 +39,11 @@ The board is represented by a plane of size 5x5, and 10 planes, each plane are r
 - Moves availables on the remaining card
 - Matrix composed of 1 if the current player is the first player, else a matrix composed of -1
 
+So, we have Input_dim = 5 x 5 x 10  
+
 
 The output dimension correspond to all the possibles moves.   
-Input_dim = 5 x 5 x 10   
+There is 16 cards, with a certain number of possible moves in each, 
 Output_dim = 5 x 5 x 52  
 
 
