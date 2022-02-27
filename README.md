@@ -39,12 +39,15 @@ The board is represented by a plane of size 5x5, and 10 planes, each plane are r
 - Moves availables on the remaining card
 - Matrix composed of 1 if the current player is the first player, else a matrix composed of -1
 
-So, we have Input_dim = 5 x 5 x 10  
+So, the input is represented by a 5 x 5 x 10 tensor. 
 
 
-The output dimension correspond to all the possibles moves.   
-There is 16 cards, with a certain number of possible moves in each, 
-Output_dim = 5 x 5 x 52  
+The output dimension correspond to all the possibles moves.  
+To encode that we need a 5x5 matrix for all the case on the board, and plane for every move. 
+There is 16 cards, with a certain number of possible moves in each, in total there is 52 differents moves.
+Some move can be played by different cards but since we need to swap the card play with the one of the board we can't regroup them. 
+
+So, the output is represented by a 5 x 5 x 52 tensor. 
 
 
 
