@@ -32,11 +32,11 @@ The board is represented by a plane of size 5x5, and 10 planes, each plane are r
 - Current player's Master pawn
 - Opponent's paws
 - Opponent's Master pawn
-- Moves availables on the current player's card 1
-- Moves availables on the player's card 2
-- Moves availables on the opponent's player's card 1
-- Moves availables on the opponent's player's card 2
-- Moves availables on the remaining card
+- Moves on the current player's card 1
+- Moves on the player's card 2
+- Moves on the opponent's player's card 1
+- Moves on the opponent's player's card 2
+- Moves on the remaining card
 - Matrix composed of 1 if the current player is the first player, else a matrix composed of -1
 
 So, the input is represented by a 5 x 5 x 10 tensor. 
