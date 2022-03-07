@@ -24,6 +24,7 @@ https://arxiv.org/pdf/1712.01815.pdf
 
 
 # Neural Network
+
 We will represent the board by a 5x5 matrix. 
 
 In the input, we need to have the information of which piece is where, as well as the card in the player hands and the one on the side
@@ -50,6 +51,8 @@ Some move can be played by different cards but since we need to swap the card pl
 So, the output is represented by a 5 x 5 x 52 tensor. 
 
 To be able to train a NN with two head we need a custom loss function. As mentionned in their paper, thye used a loss "that sums over mean-squared error and cross-entropy losses respectively"
+
+The main goal of the neural network is to fit the value and policy obtained by the Monte Carlo Tree Search (MCTS).
 
 
 # Monte Carlo Tree Search (MCTS)
