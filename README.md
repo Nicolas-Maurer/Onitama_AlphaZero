@@ -57,3 +57,8 @@ The main goal of the neural network is to fit the value and policy obtained by t
 
 # Monte Carlo Tree Search (MCTS)
 In the paper, they 800 simulations for each MCTS, and the trees were kept for the whole game.
+
+# Sources
+[1] Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm (Silver et al. 2017)
+[2] Acquisition of Chess Knowledge in AlphaZero (McGrath et al. 2021)
+[3] Deep Residual Learning for Image Recognition (He et al. 2015)
