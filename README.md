@@ -25,6 +25,11 @@ https://arxiv.org/pdf/1712.01815.pdf
 
 # Neural Network
 
+The neural network used by Alpha Zero is composed of an input block, some convolutionals blocs, 19 Residuals blocks, and 2 heads: one for the policy, one for the value.  
+The main goal of the neural network is to fit the value and policy obtained by the Monte Carlo Tree Search (MCTS).  
+For Onitama, we can use the same global architecture, the only things we need to change are the input and output dimension.  
+
+## Inputs
 We will represent the board by a 5x5 matrix. 
 
 In the input, we need to have the information of which piece is where, as well as the card in the player hands and the one on the side
@@ -42,7 +47,7 @@ The board is represented by a plane of size 5x5, and 10 planes, each plane are r
 
 So, the input is represented by a 5 x 5 x 10 tensor. 
 
-
+## Output
 The output dimension correspond to all the possibles moves.  
 To encode that we need a 5x5 matrix for all the case on the board, and plane for every move. 
 There is 16 cards, with a certain number of possible moves in each, in total there is 52 differents moves.
@@ -50,9 +55,8 @@ Some move can be played by different cards but since we need to swap the card pl
 
 So, the output is represented by a 5 x 5 x 52 tensor. 
 
+## Loss
 To be able to train a NN with two head we need a custom loss function. As mentionned in their paper, thye used a loss "that sums over mean-squared error and cross-entropy losses respectively"
-
-The main goal of the neural network is to fit the value and policy obtained by the Monte Carlo Tree Search (MCTS).
 
 
 # Monte Carlo Tree Search (MCTS)
