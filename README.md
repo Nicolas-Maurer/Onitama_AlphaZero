@@ -25,8 +25,8 @@ https://arxiv.org/pdf/1712.01815.pdf
 
 # Neural Network
 
-The neural network used by Alpha Zero is composed of an input block, some convolutionals blocs, 19 Residuals blocks, and 2 heads: one for the policy, one for the value.  
 The main goal of the neural network is to fit the value and policy obtained by the Monte Carlo Tree Search (MCTS).  
+The neural network used by Alpha Zero is composed of an input block, some convolutionals blocs, 19 Residuals blocks, and 2 heads: one for the policy, one for the value.  
 For Onitama, we can use the same global architecture, the only things we need to change are the input and output dimension.  
 
 ## Inputs
