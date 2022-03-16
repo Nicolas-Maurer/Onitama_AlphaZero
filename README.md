@@ -73,6 +73,7 @@ A classic MCTS is composed of 4 steps:
 - Backpropagation
 
 The most important part is the selection of the child, it is done using the UCB formula applied to trees. 
+This is the selection that we need to be careful in the trade between exploration and exploitation
 
 Remark: in the Simulation, instead doing a rollout, the value is obtained with the neural network. 
 
