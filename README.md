@@ -77,6 +77,10 @@ This is the selection that we need to be careful in the trade between exploratio
 
 Remark: in the Simulation, instead doing a rollout, the value is obtained with the neural network. 
 
+
+# Speed Up
+
+If we want to speed up the generation of games, we should use Numpy and Numba librairies
 # Sources
 [1] Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm (Silver et al. 2017)  
 [2] Acquisition of Chess Knowledge in AlphaZero (McGrath et al. 2021)  
