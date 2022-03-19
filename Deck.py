@@ -41,6 +41,3 @@ cobra = Card("cobra", [(0, -1), (1, 1), (-1, 1)])
 
 deck = [tiger, dragon, frog, rabbit, crab, elephant, goose,
         rooster, monkey, mantis, horse, ox, crane, boar, eel, cobra]
-
-for _ in deck:
-    print(_.map)
