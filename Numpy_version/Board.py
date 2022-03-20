@@ -1,3 +1,4 @@
+from matplotlib.pyplot import get
 import numpy as np
 from numpy.random import choice
 import random
@@ -15,24 +16,51 @@ No need to keep track
 """
 
 
-def get_board_state(board: np.array) -> np.array:
-
-    board_state = np.zeros((5, 5, 10))
-    return board_state
-
-
-def get_board_state(player, board: np.array) -> np.array:
-    pass
-
-
-# def get_next_board_state(player, board: np.array) -> np.array:
-
-
 board_2D = np.array([[-1, -1, -2, -1, -1],
                      [0,  0,  0,  0,  0],
                      [0,  0,  0,  0,  0],
                      [0,  0,  0,  0,  0],
                      [1,  1,  2,  1,  1]])
+
+
+
+def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
+    """Return the board state of size 5x5x10
+
+    Args:
+        board_2D (np.array): Human readable board
+        cards (list): Current list of cards (need to be given in the good order)
+        player (int): Current player
+
+    Returns:
+        np.array: Board state of size 5x5x10
+    """
+    
+    board_state = np.zeros((5, 5, 10))
+
+    for i in range(5):
+        for j in range(5):
+            if board_2D[i][j] == 1 * player:
+                board_state[i ,j, 0] = 1
+            if board_2D[i][j] == 2 * player:
+                board_state[i, j, 1] = 1
+            if board_2D[i][j] == -1 * player:
+                board_state[i, j, 2] = 1
+            if board_2D[i][j] == -2 * player:
+                board_state[i, j, 3] = 1
+    
+    for c, card in enumerate(cards):
+        board_state[:, :, c + 4] = card
+        
+    board_state[:, :, 9] = np.ones((5, 5)) * player
+    
+    return board_state
+
+board_state = get_board_state(board_2D, deck[:5], 1)
+
+
+# def get_next_board_state(player, board: np.array) -> np.array:
+
 
 init_deck = random.sample(deck, 5)
 board_state = get_board_state(board_2D)
