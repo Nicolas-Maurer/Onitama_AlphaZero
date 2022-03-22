@@ -1,4 +1,4 @@
-from matplotlib.pyplot import get
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.random import choice
 import random
@@ -26,7 +26,7 @@ def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
     """Return the board state of size 5x5x10
 
     Args:
-        board_2D (np.array): Human readable board
+        board_2D (np.array): Human readable board facing current player
         cards (list): Current list of cards (need to be given in the good order)
         player (int): Current player
 
@@ -55,11 +55,12 @@ def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
     return board_state
 
 
-board_state = get_board_state(board_2D, deck[:5], 1)
-
 
 init_deck = random.sample(deck, 5)
-root = [1, board_2D, get_board_state(board_2D, init_deck, 1)]
+board_state = get_board_state(board_2D, init_deck, 1)
+
+
+root = [1, board_2D, board_state]
 
 
 def init_game():
@@ -93,6 +94,13 @@ root = [1, board_2D, board_state, init_deck[0], init_deck[1],
 #             i += 1
 #     return layer_code
 
+for i in range(5):
+    for j in range(5):
+        if deck[0][i][j] != 0:
+            print(i,j) # faire -(2, 2) pour avoir les mouvements
+
+def move():
+    pass
 
 def get_value():
     pass
