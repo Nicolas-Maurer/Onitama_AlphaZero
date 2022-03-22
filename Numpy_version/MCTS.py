@@ -1,32 +1,24 @@
+from copy import deepcopy
 import numpy as np
 from collections import defaultdict
 
 
 
-def expand(state: list, possible_policy: list):
+def expand(state, possible_policy: list):
     """ Expand the node with all children with a positive probability, 
         the policy is obtained by the nn"""
 
-    # state will be list or np.array
-
-    init_value = 0
-    visit_number = 0
-    board_state = np.array()
-
-    # children = [child for child in possible_policy if child != 0]
-    children = [(board_state, prior, init_value, visit_number)
-                for prior in possible_policy if prior != 0]
-
-    return state + children
-
-    # for i, proba in enumerate(possible_policy):
-    #     if proba != 0:
-    #         # Create child
-    #         pass
-    #         # next_board = self.board.move(i)
-    #         # self.children[i] = MonteCarloTreeSearchNode(
-    #         #     model=self.model, board=next_board, prior=proba, parent=self)
-    # pass
+    # Need to copy the state, or the children won't have the same state
+    # Because we modify it on place
+    current_state = deepcopy(state)
+    
+    for i, proba in enumerate(possible_policy):
+        if proba != 0:
+            
+            # next_board = move(current_state, i)
+            # state[-1].append(next_board)
+            
+            pass
 
 
 def simulate():
@@ -37,5 +29,18 @@ def backpropagate():
     pass
 
 
-def best_child():
-    pass
+def best_child(state: list, c_param = 0.8):
+    
+    children = state[-1]
+    best_score = -np.inf
+    best_move = None
+
+    for child in children:
+        # Change string by their index in the list
+        score = - child["value"] + c_param * child["prior"] * np.sqrt(state["Number_of_visit"]) / child["Number_of_visit"]
+    
+        if score > best_score:
+            best_score = score
+            best_move = child
+
+    return best_move
