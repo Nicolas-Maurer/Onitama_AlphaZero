@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.random import choice
 import random
 import tensorflow as tf
 from copy import copy, deepcopy
@@ -21,9 +20,16 @@ board_2D = np.array([[-1, -1, -2, -1, -1],
                      [0,  0,  0,  0,  0],
                      [1,  1,  2,  1,  1]])
 
+board_2D_2 = np.array([[-1, 0, -2, -1, -1],
+                       [0,  -1,  0,  0,  0],
+                       [0,  0,  0,  0,  0],
+                       [0,  0,  0,  0,  0],
+                       [1,  1,  2,  1,  1]])
+
 
 def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
     """Return the board state of size 5x5x10
+    board_2D must be facing current player ! 
 
     Args:
         board_2D (np.array): Human readable board facing current player
@@ -38,13 +44,13 @@ def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
 
     for i in range(5):
         for j in range(5):
-            if board_2D[i][j] == 1 * player:
+            if board_2D[i][j] == 1:
                 board_state[i, j, 0] = 1
-            if board_2D[i][j] == 2 * player:
+            if board_2D[i][j] == 2:
                 board_state[i, j, 1] = 1
-            if board_2D[i][j] == -1 * player:
+            if board_2D[i][j] == -1:
                 board_state[i, j, 2] = 1
-            if board_2D[i][j] == -2 * player:
+            if board_2D[i][j] == -2:
                 board_state[i, j, 3] = 1
 
     for c, card in enumerate(cards):
@@ -55,18 +61,33 @@ def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
     return board_state
 
 
-
 init_deck = random.sample(deck, 5)
 board_state = get_board_state(board_2D, init_deck, 1)
 
-
+# Board2D is useless ? Cards are needed ?
+# root = [player, board2D, board_state, value, number_of_visit, [children]]
 root = [1, board_2D, board_state]
+
+
+for i in range(10):
+    print("--------", i, "--------------")
+    print(board_state[:, :, i])
+
+
+def get_board_2D(board_state: np.array) -> np.array:
+
+    # Two first plane always represent the current player's pawns
+    # And the two next, the opponent player's pawns
+    board_2D = board_state[:, :, 0] + board_state[:, :, 1] * 2 + \
+              (board_state[:, :, 2] + board_state[:, :, 3] * 2) * -1
+
+    return board_2D
 
 
 def init_game():
     pass
 # j1 cards, j2 cards, remaining card neccessary? they can be encoded in board_state ?
-# root = [player, board_2D, board_state, j1 cards, j2 cards, remaining card, value, number_of_visit, [childs]]
+
 
 # player is 1 or -1
 # board_2D is the current board
@@ -97,10 +118,12 @@ root = [1, board_2D, board_state, init_deck[0], init_deck[1],
 for i in range(5):
     for j in range(5):
         if deck[0][i][j] != 0:
-            print(i,j) # faire -(2, 2) pour avoir les mouvements
+            print(i, j)  # faire -(2, 2) pour avoir les mouvements
+
 
 def move():
     pass
+
 
 def get_value():
     pass
