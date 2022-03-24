@@ -44,3 +44,4 @@ def best_child(state: list, c_param = 0.8):
             best_move = child
 
     return best_move
+

@@ -105,43 +105,95 @@ cards_name = ["tiger", "dragon", "frog", "rabbit", "crab", "elephant", "goose",
 layer_code = get_layer_codes(deck, cards_name)
 layer_decode = {v: k for k, v in layer_code.items()}
 
+list_cards = list(zip(deck, cards_name))
+
+# Need to optimize this function ?
+
 
 def get_legals_moves(board_state: np.array, policy: np.array) -> np.array:
+    """ Returns all the legal moves of the policy from the state
 
-    # Returns all the legal moves for a policy obtained with the neural network
+    Args:
+        board_state (np.array): State of the board : 5x5x10
+        policy (np.array): Probability of next moves given by the NN : 5x5x52
+
+    Returns:
+        np.array: Filtered probability of the next moves : 5x5x52
+    """
+
+    # list_cards and layer_code are global variable
 
     player_board = board_state[:, :, 0] + board_state[:, :, 1]
     player_card_1 = board_state[:, :, 4]
     player_card_2 = board_state[:, :, 5]
 
-    possibles_moves = []  # how to get card name ?
-    # list(zip(cards_name, deck))
+    player_card_1_name = [
+        ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_1)][0]
+    player_card_2_name = [
+        ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_2)][0]
 
-    for card in [player_card_1, player_card_2]:
+    # All 'possible' moves
+    possibles_moves = []
+    for card, name in [(player_card_1, player_card_1_name), (player_card_2, player_card_2_name)]:
         for i in range(5):
             for j in range(5):
                 if card[i][j] != 0:
-                    possibles_moves.append("card_name", i - 2, j - 2)
+                    possibles_moves.append((name, (i - 2, j - 2)))
+
+    # Is there another, and better way to get the name of the cards?
 
     possible_policy = np.zeros((5, 5, 52))
-    # taille 5 x 5 x 52, ou 52 represente 1 mouvement d'une carte
-    # Si je te dis 38 je dois pouvoir identifier qu'il s'agit du mouvement ('ox', (0, 1))
-    # 5 x 5 est l'endroit ou la pièce arrive.
+
+    # All feasible moves
+    for card, (line, column) in possibles_moves:
+        for i in range(5):
+            for j in range(5):
+                if player_board[i][j] != 0:
+                    if (0 <= i + line < 5) and (0 <= j + column < 5):
+                        possible_policy[i + line, j + column, layer_code[card, (line, column)]] = \
+                            policy[i + line, j + column,
+                                   layer_code[card, (line, column)]]
 
     # We can't land on our pieces
     for k in range(possible_policy.shape[2]):
-        possible_policy[:, :, k] = possible_policy[:, :, k] * (1 - player_board)
-        
+        possible_policy[:, :, k] = possible_policy[:, :, k] * \
+            (1 - player_board)
+
     # Then we normalize to [0, 1]
     possible_policy = possible_policy / np.sum(possible_policy)
     return possible_policy
 
 
+board_state = root[0]
+policy = np.random.uniform(0, 1, size=(5, 5, 52))
+possible_moves = get_legals_moves(board_state, policy)
+
+print("Number of possible moves from this state :", len(
+    [i for i in possible_moves.flatten() if i != 0]))
+
+player_card_1 = board_state[:, :, 4]
+player_card_2 = board_state[:, :, 5]
+print(player_card_1)
+print(player_card_2)
 
 # move : get new board state : swap card and , swap plane of piece and move the piece, and change player value
 
 
-def move():
+def move(state: np.array, action: int):
+    
+    # Action correspond to a index of the policy
+    
+    # find the piece to move in the board
+    plane = action % 52
+    column = action // 52 % 5
+    line = action // 52 // 5
+    
+    print(plane, column, line)
+    
+    card, (x, y) = layer_decode[plane]
+    # Or layer_decode is a list, and layer_decode[plane] return the nth element of it.
+
+    piece_to_move = (line - x, column - y)
     pass
 
 
@@ -149,10 +201,4 @@ def get_value():
     pass
 
 
-def get_children():
-    pass
-
-
-def get_legal_moves():
-    pass
 
