@@ -102,12 +102,12 @@ cards_name = ["tiger", "dragon", "frog", "rabbit", "crab", "elephant", "goose",
               "rooster", "monkey", "mantis", "horse", "ox", "crane", "boar", "eel", "cobra"]
 
 
+# Transform this 3 variables to nb.Typed.Dict() ?
 layer_code = get_layer_codes(deck, cards_name)
 layer_decode = {v: k for k, v in layer_code.items()}
-
 list_cards = list(zip(deck, cards_name))
 
-# Need to optimize this function ?
+# This will help get_legals_moves() to run faster with dict
 
 
 def get_legals_moves(board_state: np.array, policy: np.array) -> np.array:
@@ -176,24 +176,60 @@ player_card_2 = board_state[:, :, 5]
 print(player_card_1)
 print(player_card_2)
 
-# move : get new board state : swap card and , swap plane of piece and move the piece, and change player value
 
+def move(state: np.array, action: int) -> np.array:
 
-def move(state: np.array, action: int):
-    
-    # Action correspond to a index of the policy
-    
-    # find the piece to move in the board
+    # find where to land on the board
     plane = action % 52
     column = action // 52 % 5
     line = action // 52 // 5
-    
-    print(plane, column, line)
-    
-    card, (x, y) = layer_decode[plane]
-    # Or layer_decode is a list, and layer_decode[plane] return the nth element of it.
 
-    piece_to_move = (line - x, column - y)
+    card, (x, y) = layer_decode[plane]
+    # Layer_decode can be a list, and layer_decode[plane] return the nth element of it.
+    
+    # Find the position of the piece to move
+    piece_x, piece_y = (line - x, column - y)
+    
+    # Create new state
+    next_state = state.copy()
+
+    # Swap the card played with the remaining.
+    # How to find the played card ? by name with a dict ?
+    # state[:, :, 8] is always the remaining card
+    next_state[:, :, "carte jouée"] = state[:, :, 8]
+    next_state[:, :, 8] = state[:, :, "carte jouée"]
+
+    # Swap planes of the cards
+    c1, c2 = next_state[:, :, 4], next_state[:, :, 5]
+    next_state[:, :, 4] = next_state[:, :, 6]
+    next_state[:, :, 5] = next_state[:, :, 7]
+    next_state[:, :, 6], next_state[:, :, 7] = c1, c2
+
+    # Find the piece (pawn or king)
+    if next_state[piece_x, piece_y, 0] == 1:
+        next_state[line, column , 0] = 1
+        next_state[piece_x, piece_y, 0] = 1
+        
+    else:
+        next_state[line, column , 1] = 1
+        next_state[piece_x, piece_y, 1] = 1
+        
+    # Turn the board (4 first planes) to face the new player
+    board_state[:, :, 0:5] = np.rot90(np.rot90(board_state[:, :, 0:5]))
+
+    # Swap planes of the board
+    b1, b2 = next_state[:, :, 0], next_state[:, :, 1]
+    next_state[:, :, 0] = next_state[:, :, 2]
+    next_state[:, :, 1] = next_state[:, :, 3]
+    next_state[:, :, 2], next_state[:, :, 3] = b1, b2
+
+    # Change player
+    next_state[:, :, 9] *= -1
+
+    return next_state
+
+
+def is_game_over(state: np.array) -> bool:
     pass
 
 
@@ -201,4 +237,5 @@ def get_value():
     pass
 
 
-
+action = np.argmax(possible_moves)
+move(board_state, action)
