@@ -176,6 +176,7 @@ player_card_2 = board_state[:, :, 5]
 print(player_card_1)
 print(player_card_2)
 
+# TODO convert list to typed for numba 
 
 def move(state: np.array, action: int) -> np.array:
 
