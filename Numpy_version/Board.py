@@ -185,7 +185,7 @@ def move(state: np.array, action: int) -> np.array:
     column = action // 52 % 5
     line = action // 52 // 5
 
-    card, (x, y) = layer_decode[plane]
+    card_name, (x, y) = layer_decode[plane]
     # Layer_decode can be a list, and layer_decode[plane] return the nth element of it.
     
     # Find the position of the piece to move
@@ -197,9 +197,18 @@ def move(state: np.array, action: int) -> np.array:
     # Swap the card played with the remaining.
     # How to find the played card ? by name with a dict ?
     # state[:, :, 8] is always the remaining card
-    next_state[:, :, "carte jouée"] = state[:, :, 8]
-    next_state[:, :, 8] = state[:, :, "carte jouée"]
 
+    played_card = [card for card, name in list_cards if name == card_name][0]
+
+    # played card is in J1 hand, so it's the plane 4 or 5 
+    if np.array_equal(state[:, :, 4], played_card):
+        next_state[:, :, 4] = state[:, :, 8]
+        next_state[:, :, 8] = state[:, :, 4]
+        
+    else:
+        next_state[:, :, 5] = state[:, :, 8]
+        next_state[:, :, 8] = state[:, :, 5]
+        
     # Swap planes of the cards
     c1, c2 = next_state[:, :, 4], next_state[:, :, 5]
     next_state[:, :, 4] = next_state[:, :, 6]
