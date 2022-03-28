@@ -1,16 +1,10 @@
 import numpy as np
 import random
-from copy import copy, deepcopy
 from Numpy_version.Deck import deck
-import tensorflow as tf
 import numba as nb
-import time
-
 
 def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
     """Return the board state of size 5x5x10
-
-    ! board_2D must be facing current player ! 
 
     Args:
         board_2D (np.array): Human readable board facing current player
@@ -52,7 +46,7 @@ def get_board_2D(board_state: np.array) -> np.array:
         np.array: Human readable board
     """
 
-    player = board_state[:, :, 9][0][0]
+    player = board_state[0, 0, 9]
 
     # Two first plane always represent the current player's pawns
     # And the two next, the opponent player's pawns
@@ -62,52 +56,19 @@ def get_board_2D(board_state: np.array) -> np.array:
     return board_2D
 
 
-def init_game(deck: list) -> list:
-
-    init_board_2D = np.array([[-1, -1, -2, -1, -1],
-                              [0,  0,  0,  0,  0],
-                              [0,  0,  0,  0,  0],
-                              [0,  0,  0,  0,  0],
-                              [1,  1,  2,  1,  1]])
-    init_deck = random.sample(deck, 5)
-    init_board_state = get_board_state(init_board_2D, init_deck, 1)
-
-    # Board2D and cards don't need to be encoded, as they are included in board_state ?
-    # root = [board_state, value, number_of_visit, [children]]
-    root = [init_board_state, 0, 0, []]
-
-    return root
-
-
-root = init_game(deck)
-
-
 # Dictionnary need to be transformed in numba.type.Dict() to be supported by Numba
-def get_layer_codes(deck: list, cards_name: list) -> dict:
+def get_layer_code(deck: list, cards_name: list) -> dict:
 
     layer_code = {}
-    count = 0
+    counter = 0
     for card, name in zip(deck, cards_name):
         for i in range(5):
             for j in range(5):
                 if card[i][j] != 0:
                     # (i - 2, j - 2) if we want to be consistent with the last version.
-                    layer_code[name, (i - 2, j - 2)] = count
-                    count += 1
+                    layer_code[name, (i - 2, j - 2)] = counter
+                    counter += 1
     return layer_code
-
-
-deck
-cards_name = ["tiger", "dragon", "frog", "rabbit", "crab", "elephant", "goose",
-              "rooster", "monkey", "mantis", "horse", "ox", "crane", "boar", "eel", "cobra"]
-
-
-# Transform this 3 variables to nb.Typed.Dict() ?
-layer_code = get_layer_codes(deck, cards_name)
-layer_decode = {v: k for k, v in layer_code.items()}
-list_cards = list(zip(deck, cards_name))
-
-# This will help get_legals_moves() to run faster with dict
 
 
 def get_legals_moves(board_state: np.array, policy: np.array) -> np.array:
@@ -127,10 +88,16 @@ def get_legals_moves(board_state: np.array, policy: np.array) -> np.array:
     player_card_1 = board_state[:, :, 4]
     player_card_2 = board_state[:, :, 5]
 
-    player_card_1_name = [
-        ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_1)][0]
-    player_card_2_name = [
-        ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_2)][0]
+    try:
+        player_card_1_name = [
+            ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_1)][0]
+        player_card_2_name = [
+            ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_2)][0]
+    except:
+        print("player_card_1", player_card_1)
+        print("player_card_2", player_card_2)
+        
+        print(list_cards)
 
     # All 'possible' moves
     possibles_moves = []
@@ -164,74 +131,57 @@ def get_legals_moves(board_state: np.array, policy: np.array) -> np.array:
     return possible_policy
 
 
-board_state = root[0]
-policy = np.random.uniform(0, 1, size=(5, 5, 52))
-possible_moves = get_legals_moves(board_state, policy)
-
-print("Number of possible moves from this state :", len(
-    [i for i in possible_moves.flatten() if i != 0]))
-
-player_card_1 = board_state[:, :, 4]
-player_card_2 = board_state[:, :, 5]
-print(player_card_1)
-print(player_card_2)
-
-# TODO convert list to typed for numba 
-
-def move(state: np.array, action: int) -> np.array:
+def move(board_state: np.array, action: int) -> np.array:
 
     # find where to land on the board
     plane = action % 52
     column = action // 52 % 5
     line = action // 52 // 5
 
+    # Card and move of the card played.
     card_name, (x, y) = layer_decode[plane]
-    # Layer_decode can be a list, and layer_decode[plane] return the nth element of it.
     
     # Find the position of the piece to move
     piece_x, piece_y = (line - x, column - y)
-    
+
     # Create new state
-    next_state = state.copy()
+    next_state = board_state.copy()
 
-    # Swap the card played with the remaining.
-    # How to find the played card ? by name with a dict ?
-    # state[:, :, 8] is always the remaining card
-
-    played_card = [card for card, name in list_cards if name == card_name][0]
-
-    # played card is in J1 hand, so it's the plane 4 or 5 
-    if np.array_equal(state[:, :, 4], played_card):
-        next_state[:, :, 4] = state[:, :, 8]
-        next_state[:, :, 8] = state[:, :, 4]
-        
-    else:
-        next_state[:, :, 5] = state[:, :, 8]
-        next_state[:, :, 8] = state[:, :, 5]
-        
-    # Swap planes of the cards
-    c1, c2 = next_state[:, :, 4], next_state[:, :, 5]
-    next_state[:, :, 4] = next_state[:, :, 6]
-    next_state[:, :, 5] = next_state[:, :, 7]
-    next_state[:, :, 6], next_state[:, :, 7] = c1, c2
-
-    # Find the piece (pawn or king)
+    # Find the played piece (pawn or king)
     if next_state[piece_x, piece_y, 0] == 1:
-        next_state[line, column , 0] = 1
-        next_state[piece_x, piece_y, 0] = 1
-        
-    else:
-        next_state[line, column , 1] = 1
-        next_state[piece_x, piece_y, 1] = 1
-        
-    # Turn the board (4 first planes) to face the new player
-    board_state[:, :, 0:5] = np.rot90(np.rot90(board_state[:, :, 0:5]))
+        next_state[line, column, 0] = 1
+        next_state[piece_x, piece_y, 0] = 0
 
-    # Swap planes of the board
-    b1, b2 = next_state[:, :, 0], next_state[:, :, 1]
+    else:
+        next_state[line, column, 1] = 1
+        next_state[piece_x, piece_y, 1] = 0
+
+    # Turn the board (4 first planes) to face the new player
+    next_state[:, :, 0:4] = np.rot90(np.rot90(next_state[:, :, 0:4]))
+
+    # Swap planes of the board  
+    b1, b2 = next_state[:, :, 0].copy(), next_state[:, :, 1].copy()
     next_state[:, :, 0] = next_state[:, :, 2]
     next_state[:, :, 1] = next_state[:, :, 3]
     next_state[:, :, 2], next_state[:, :, 3] = b1, b2
+    
+    # Find the played card associated with the card name
+    played_card = [card for card, name in list_cards if name == card_name][0]
+
+    # played card is in J1 hand, so it's the plane 4 or 5
+    if np.array_equal(board_state[:, :, 4], played_card):
+        next_state[:, :, 4] = board_state[:, :, 8]
+        next_state[:, :, 8] = board_state[:, :, 4]
+
+    else:
+        next_state[:, :, 5] = board_state[:, :, 8]
+        next_state[:, :, 8] = board_state[:, :, 5]
+
+    # Swap planes of the cards
+    c1, c2 = next_state[:, :, 4].copy(), next_state[:, :, 5].copy()
+    next_state[:, :, 4] = next_state[:, :, 6]
+    next_state[:, :, 5] = next_state[:, :, 7]
+    next_state[:, :, 6], next_state[:, :, 7] = c1, c2
 
     # Change player
     next_state[:, :, 9] *= -1
@@ -239,13 +189,32 @@ def move(state: np.array, action: int) -> np.array:
     return next_state
 
 
-def is_game_over(state: np.array) -> bool:
-    pass
+def is_game_over(board_state: np.array) -> bool:
+
+    # if a king managed to go to the other side
+    if board_state[0, 2, 1] == 1:
+        return True
+    
+    # if the enemy king is alive return False
+    for i in range(5):
+        for j in range(5):
+            if board_state[i, j, 3] == 1:
+                return False
+            
+    return True
 
 
-def get_value():
-    pass
+def get_reward_for_player(board_state):
 
+    if is_game_over(board_state):
+        return -1
+    else:
+        return None
 
-action = np.argmax(possible_moves)
-move(board_state, action)
+cards_name = ["tiger", "dragon", "frog", "rabbit", "crab", "elephant", "goose",
+                "rooster", "monkey", "mantis", "horse", "ox", "crane", "boar", "eel", "cobra"]
+
+# Transform this 3 variables to nb.Typed.Dict() ?
+layer_code = get_layer_code(deck, cards_name)
+layer_decode = {v: k for k, v in layer_code.items()}
+list_cards = list(zip(deck, cards_name))
