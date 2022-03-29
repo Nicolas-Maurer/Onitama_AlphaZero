@@ -1,7 +1,9 @@
+import tensorflow as tf
 import numpy as np
 from Numpy_version.Board import *
 from Numpy_version.Deck import deck
 from NNet_architecture import create_model
+
 
 def init_game(deck: list) -> list:
 
@@ -12,8 +14,8 @@ def init_game(deck: list) -> list:
                               [1,  1,  2,  1,  1]])
     init_deck = random.sample(deck, 5)
     init_board_state = get_board_state(init_board_2D, init_deck, 1)
-    # root = [board_state, prior, value, number_of_visit, [children]]
-    root = [init_board_state, 0, 0, 0, []]
+    # root = [board_state, action, prior, value, number_of_visit, [children]]
+    root = [init_board_state, None, 0, 0, 0, []]
 
     return root
 
@@ -21,23 +23,22 @@ def init_game(deck: list) -> list:
 def expand(state: np.array, possible_policy: list):
     """ Expand the node with all children with a positive probability, 
         the policy is obtained by the nn"""
-    # add prior to root
+
     board_state = state[0]
 
-    state[-1] = [[move(board_state, i), 0, 0, 0, []]
+    state[-1] = [[move(board_state, i), i, proba, 0, 0, []]
                  for i, proba in enumerate(possible_policy) if proba != 0]
 
 
 def get_best_child(state: list, c_param=0.8) -> list:
 
-    children = state[-1]
     best_score = -np.inf
     best_child = None
 
-    for child in children:
-        # Prior is at index 1, value at index 2, number_of_visit at index 3
-        score = - child[2] + c_param * child[1] * \
-            np.sqrt(state[3]) / (child[3] + 1)
+    for child in state[-1]:
+        # Prior is at index 2, number_of_visit at index 4
+        score = -get_value(child) + c_param * child[2] * \
+            np.sqrt(state[4]) / (child[4] + 1)
 
         if score > best_score:
             best_score = score
@@ -46,28 +47,47 @@ def get_best_child(state: list, c_param=0.8) -> list:
     return best_child
 
 
-def simulate(state: list, nb_simulation: int, model):
+def get_value(state: list) -> int:
+    """ Return the the value of a state
     
+    Args:
+        state (list): State of the game
+
+    Returns:
+        int: Value of the state
+    """
+    # value at index 3, number_of_visit at index 4
+    if state[4]:
+        return state[3] / state[4]
+    else:
+        return 0
+
+
+def simulate(state: list, nb_simulation: int, model):
+
     for _ in range(nb_simulation):
-        print(_)
-        search_path = [state]
-        
+        if _ % 50 == 0:
+            print(_)
+
+        node_to_expand = state
+        search_path = [node_to_expand]
+
         # select the node
-        while state[-1]:
-            state = get_best_child(state)
-            search_path.append(state)
-        
-        board_state = state[0]
+        while node_to_expand[-1]:
+            node_to_expand = get_best_child(node_to_expand)
+            search_path.append(node_to_expand)
+
+        board_state = node_to_expand[0]
         value = get_reward_for_player(board_state)
-        
+
         if value is None:
             policy, value = model.predict(board_state.reshape((1, 5, 5, 10)))
-            possible_policy = get_legals_moves(board_state, policy[0]).flatten()
+            possible_policy = get_legals_moves(
+                board_state, policy[0]).flatten()
 
-            expand(state, possible_policy)
+            expand(node_to_expand, possible_policy)
 
         backpropagate(search_path, value, board_state[0, 0, 9])
-    
 
 
 def backpropagate(search_path: list, value: float, to_play: int):
@@ -78,27 +98,49 @@ def backpropagate(search_path: list, value: float, to_play: int):
         value (float): The value to backpropagate
         to_play (int): The player
     """
-    print("search_path")
-    print(len(search_path))
     for state in reversed(search_path):
-        state[2] += value if state[0][0, 0, 9] == to_play else -value
-        state[3] += 1
-        
-        
-root = init_game(deck)
-
-model = create_model()
-simulate(root, 10, model)
-
-
+        state[3] += value if state[0][0, 0, 9] == to_play else -value
+        state[4] += 1
 
 def pretty_print(state):
-    
+
     print(get_board_2D(state[0]))
-    print("Prior: {} Count: {} Value: {}".format(state[1], state[3], state[2]))
+    print("Prior: {} Count: {} Value: {}".format(
+        state[2], state[4], get_value(state)))
 
     for child in state[-1]:
         print(get_board_2D(child[0]))
-        print("Prior: {} Count: {} Value: {}".format(child[1], child[3], child[2]))
+        print("Prior: {} Count: {} Value: {}".format(
+            child[2], child[4], get_value(child)))
 
-pretty_print(root)
+
+
+
+# root = init_game(deck)
+
+# model = create_model()
+# simulate(root, 100, model)
+
+# pretty_print(root)
+
+# Objectif à battre : 67 secondes pour 1000 coups
+# Sans eager mode : 35 secondes pour 1000 coups
+
+# https://stackoverflow.com/questions/62681257/tf-keras-model-predict-is-slower-than-straight-numpy
+# # Disables eager execution
+# tf.compat.v1.disable_eager_execution()
+# print(tf.executing_eagerly())
+
+
+if __name__ == "__main__":
+    import cProfile
+    from pstats import Stats
+
+    pr = cProfile.Profile()
+    pr.enable()
+
+    simulate(root, 1000, model)
+
+    pr.disable()
+    stats = Stats(pr)
+    stats.sort_stats('tottime').print_stats(20)
