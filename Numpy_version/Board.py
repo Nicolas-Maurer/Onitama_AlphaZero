@@ -155,6 +155,10 @@ def move(board_state: np.array, action: int) -> np.array:
     else:
         next_state[line, column, 1] = 1
         next_state[piece_x, piece_y, 1] = 0
+    
+    # Kill the enemy piece, if there is one on the place we land
+    next_state[line, column, 3] = 0
+    next_state[line, column, 4] = 0
 
     # Turn the board (4 first planes) to face the new player
     next_state[:, :, 0:4] = np.rot90(np.rot90(next_state[:, :, 0:4]))

@@ -65,7 +65,7 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
 model = create_model()
 # model = load_model("models/model1.h5")
 
-self_play(model, "test", 100, 1)
+self_play(model, "test", 10, 1)
 
 ##
 
@@ -82,7 +82,7 @@ while game < nb_games:
 
     node = games[game]
     i = 0
-    while not is_game_over(node[0]) and i < max_move_per_game:
+    while not is_game_over(node[0]) and i < 20:
         simulate(node, nb_simulations, model)
         
         # Find the best move, i.e the most visited
@@ -105,8 +105,9 @@ while game < nb_games:
         # Go to the next child
         node = node[-1][index]
 
-        plt.imshow(get_board_2D(node[0]))
-        plt.show()
+        print(get_board_2D(node[0]))
+        # plt.imshow(get_board_2D(node[0]))
+        # plt.show()
         i += 1
         print("-----------", i)
 
@@ -116,33 +117,17 @@ while game < nb_games:
     
     
 
-##########
-model = create_model()
-max_move_per_game = np.inf
-nb_simulations = 10
-nb_games = 1
-games = [init_game(deck) for _ in range(nb_games)]
-node = games[0]
-simulate(node, nb_simulations, model)
-        
-# Find the best move, i.e the most visited
-child_visits = [child[4] for child in node[-1]]
-index = np.argmax(child_visits)
+b = board_states[3] 
 
-# MCTS policy
-policy = np.zeros(5 * 5 * 52)
-total_visits = sum(child_visits)
-for child in node[-1]:
-    policy[child[1]] = child[4]/total_visits
+for i in range(10):
+    print(i)
+    print(b[:, :,i])
+    
 
-policies.append(policy)
-board_states.append(node[0])
-values.append(get_value(node))
 
-# Go to the next child
-node = node[-1][index]
+b = board_states[13] 
 
-plt.imshow(get_board_2D(node[0]))
-plt.show()
-i
-print("-----------", i)
+for i in range(10):
+    print(i)
+    print(b[:, :,i])
+    
