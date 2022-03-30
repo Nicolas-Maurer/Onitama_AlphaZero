@@ -88,16 +88,10 @@ def get_legals_moves(board_state: np.array, policy: np.array) -> np.array:
     player_card_1 = board_state[:, :, 4]
     player_card_2 = board_state[:, :, 5]
 
-    try:
-        player_card_1_name = [
-            ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_1)][0]
-        player_card_2_name = [
-            ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_2)][0]
-    except:
-        print("player_card_1", player_card_1)
-        print("player_card_2", player_card_2)
-        
-        print(list_cards)
+    player_card_1_name = [
+        ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_1)][0]
+    player_card_2_name = [
+        ele[1] for ele in list_cards if np.array_equal(ele[0], player_card_2)][0]
 
     # All 'possible' moves
     possibles_moves = []
@@ -157,8 +151,8 @@ def move(board_state: np.array, action: int) -> np.array:
         next_state[piece_x, piece_y, 1] = 0
     
     # Kill the enemy piece, if there is one on the place we land
+    next_state[line, column, 2] = 0
     next_state[line, column, 3] = 0
-    next_state[line, column, 4] = 0
 
     # Turn the board (4 first planes) to face the new player
     next_state[:, :, 0:4] = np.rot90(np.rot90(next_state[:, :, 0:4]))

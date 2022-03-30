@@ -133,12 +133,16 @@ def pretty_print(state):
 
 
 if __name__ == "__main__":
+    from Numpy_version.MCTS import init_game
+    root = init_game(deck)
+    model = create_model()
+    
     import cProfile
     from pstats import Stats
 
     pr = cProfile.Profile()
     pr.enable()
-
+    
     simulate(root, 1000, model)
 
     pr.disable()
