@@ -148,3 +148,14 @@ if __name__ == "__main__":
     pr.disable()
     stats = Stats(pr)
     stats.sort_stats('tottime').print_stats(20)
+
+
+root = init_game(deck)
+get_board_2D(root[0])
+
+model = create_model()
+simulate(root, 1000, model)
+pretty_print(root)
+
+root[0][:, :, 4]
+root[0][:, :, 5]
