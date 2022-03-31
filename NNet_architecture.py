@@ -82,3 +82,55 @@ def create_model():
     model.compile(loss=['categorical_crossentropy',
                   'mean_squared_error'], optimizer="Adam")
     return model
+
+
+def create_model_2():
+
+    # input_block
+    input_block = layers.Input(shape=(5, 5, 10))
+
+    # convolutionnal_layer
+    x = layers.Conv2D(filters=256, kernel_size=(
+        3, 3), padding="same", activation="linear")(input_block)
+    x = layers.BatchNormalization()(x)
+    x = layers.LeakyReLU()(x)
+
+    # 19 Residual blocks with a skip connection
+    for _ in range(9):
+        y = layers.Conv2D(filters=256, kernel_size=(
+            3, 3), padding="same", strides=1, activation="linear")(x)
+        y = layers.BatchNormalization()(y)
+        y = layers.LeakyReLU()(y)
+
+        y = layers.Conv2D(filters=256, kernel_size=(
+            3, 3), padding="same", strides=1, activation="linear")(y)
+        y = layers.BatchNormalization()(y)
+
+        x = layers.Add()([x, y])
+        x = layers.LeakyReLU()(x)
+
+    # policy_head with a final convolution of 52 filters
+    policy_head = layers.Conv2D(filters=256, kernel_size=(
+        1, 1), padding="same", activation="linear")(x)
+    policy_head = layers.BatchNormalization()(policy_head)
+    policy_head = layers.LeakyReLU()(policy_head)
+    policy_head = layers.Conv2D(filters=52, kernel_size=(
+        1, 1), padding="same", activation="linear")(policy_head)
+    policy_head = layers.Softmax()(policy_head)
+
+    # value_head
+    value_head = layers.Conv2D(filters=1, kernel_size=(
+        1, 1), padding="same", strides=1, activation="linear")(x)
+    value_head = layers.BatchNormalization()(value_head)
+    value_head = layers.LeakyReLU()(value_head)
+    value_head = layers.Flatten()(value_head)
+    value_head = layers.Dense(256, activation="linear")(value_head)
+    value_head = layers.LeakyReLU()(value_head)
+    value_head = layers.BatchNormalization()(value_head)
+    value_head = layers.Dense(1, activation="tanh",
+                              name="value_head")(value_head)
+
+    model = Model(inputs=[input_block], outputs=[policy_head, value_head])
+    model.compile(loss=['categorical_crossentropy',
+                  'mean_squared_error'], optimizer="Adam")
+    return model
