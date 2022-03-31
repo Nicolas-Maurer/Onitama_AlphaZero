@@ -1,6 +1,7 @@
 from NNet_architecture import create_model
 from Numpy_version.MCTS import *
 from Numpy_version.Deck import deck
+import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import os
@@ -52,18 +53,51 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
             # Go to the next child
             node = node[-1][index]
 
-            plt.imshow(get_board_2D(node[0]))
-            plt.show()
+            # plt.imshow(get_board_2D(node[0]))
+            # plt.show()
+
             i += 1
             print("-----------", i)
-
+        
         game += 1
         print("-----------------------------------------",
               game, "-----------------------------------------")
+        
+        
+        if not os.path.exists(f"self_games"):
+            os.mkdir(f"self_games")
 
+        if not os.path.exists(f"self_games/{model_name}"):
+            os.mkdir(f"self_games/{model_name}")
+
+        old_nb_games = 0
+        # Add the new generated game, policies, and values to old ones.
+        if os.path.exists(f'self_games/{model_name}/{nb_simulations}_simu_board_states.pickle'):
+
+            old_board_states, old_policies, old_values, old_nb_games = load_data(
+                model_name, nb_simulations)
+
+            board_states = old_board_states + board_states
+            policies = old_policies + policies
+            values = old_values + values
+
+        game_played = old_nb_games + 1
+        with open(f'self_games/{model_name}/{nb_simulations}_simu_board_states.pickle', 'wb') as handle:
+            pickle.dump(board_states, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f'self_games/{model_name}/{nb_simulations}_simu_policies.pickle', 'wb') as handle:
+            pickle.dump(policies, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f'self_games/{model_name}/{nb_simulations}_simu_values.pickle', 'wb') as handle:
+            pickle.dump(values, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f'self_games/{model_name}/{nb_simulations}_simu_nb_games.pickle', 'wb') as handle:
+            pickle.dump(game_played, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            
+            
+import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
 
 model = create_model()
 # model = load_model("models/model1.h5")
 
-self_play(model, "test", 10, 1)
+self_play(model, "test_numpy", 400, 10)
+
 

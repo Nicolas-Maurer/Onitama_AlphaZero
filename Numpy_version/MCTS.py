@@ -113,18 +113,8 @@ def pretty_print(state):
         print("Prior: {} Count: {} Value: {}".format(
             child[2], child[4], get_value(child)))
 
-
-
-
-# root = init_game(deck)
-
-# model = create_model()
-# simulate(root, 100, model)
-
-# pretty_print(root)
-
-# Objectif à battre : 67 secondes pour 1000 coups
-# Sans eager mode : 35 secondes pour 1000 coups
+# Goal to beat : 67 seconds for a MCTS with 1000 simulations
+# Without eager mode : 35 seconds for a MCTS with 1000 simulations
 
 # https://stackoverflow.com/questions/62681257/tf-keras-model-predict-is-slower-than-straight-numpy
 # # Disables eager execution
@@ -148,14 +138,3 @@ if __name__ == "__main__":
     pr.disable()
     stats = Stats(pr)
     stats.sort_stats('tottime').print_stats(20)
-
-
-root = init_game(deck)
-get_board_2D(root[0])
-
-model = create_model()
-simulate(root, 1000, model)
-pretty_print(root)
-
-root[0][:, :, 4]
-root[0][:, :, 5]

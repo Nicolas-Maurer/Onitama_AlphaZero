@@ -193,10 +193,10 @@ def is_game_over(board_state: np.array) -> bool:
     if board_state[0, 2, 1] == 1:
         return True
     
-    # if the enemy king is alive return False
+    # if the king is alive return False
     for i in range(5):
         for j in range(5):
-            if board_state[i, j, 3] == 1:
+            if board_state[i, j, 1] == 1:
                 return False
             
     return True
