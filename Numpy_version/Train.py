@@ -98,6 +98,9 @@ tf.compat.v1.disable_eager_execution()
 model = create_model()
 # model = load_model("models/model1.h5")
 
-self_play(model, "test_numpy", 400, 10)
+self_play(model, "test_numpy", 400, 10, max_move_per_game=150)
+
+
+board_states, policies, values, nb_games = load_data("test_numpy", 400)
 
 
