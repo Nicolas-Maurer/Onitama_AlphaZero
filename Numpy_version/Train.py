@@ -91,16 +91,17 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
         with open(f'self_games/{model_name}/{nb_simulations}_simu_nb_games.pickle', 'wb') as handle:
             pickle.dump(game_played, handle, protocol=pickle.HIGHEST_PROTOCOL)
             
-            
-import tensorflow as tf
-tf.compat.v1.disable_eager_execution()
 
-model = create_model()
-# model = load_model("models/model1.h5")
+if __name__ == "__main__":
+    
+    import tensorflow as tf
+    tf.compat.v1.disable_eager_execution()
 
-self_play(model, "test_numpy", 400, 10, max_move_per_game=150)
+    model = create_model()
+    # model = load_model("models/model1.h5")
 
+    self_play(model, "test_numpy", 400, 10, max_move_per_game=150)
 
-board_states, policies, values, nb_games = load_data("test_numpy", 400)
+    board_states, policies, values, nb_games = load_data("test_numpy", 400)
 
 
