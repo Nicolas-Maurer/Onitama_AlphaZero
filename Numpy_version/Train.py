@@ -22,10 +22,19 @@ def load_data(model_name, nb_simulations):
 
 
 def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_game=np.inf):
-    
+    """ Generate game and save them
+
+    Args:
+        model (_type_): _description_
+        model_name (str): name of the model for saving games
+        nb_simulations (int, optional): Number of simulations in MCTS Defaults to 200.
+        nb_games (int, optional): Number of games to simulate
+        max_move_per_game (_type_, optional): max number of move per game Defaults to np.inf.
+    """
+
     games = [init_game(deck) for _ in range(nb_games)]
     game = 0
-    
+
     while game < nb_games:
         board_states = []
         values = []
@@ -35,7 +44,7 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
         i = 0
         while not is_game_over(node[0]) and i < max_move_per_game:
             simulate(node, nb_simulations, model)
-            
+
             # Find the best move, i.e the most visited
             child_visits = [child[4] for child in node[-1]]
             index = np.argmax(child_visits)
@@ -58,12 +67,11 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
 
             i += 1
             print("-----------", i)
-        
+
         game += 1
         print("-----------------------------------------",
               game, "-----------------------------------------")
-        
-        
+
         if not os.path.exists(f"self_games"):
             os.mkdir(f"self_games")
 
@@ -90,10 +98,10 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
             pickle.dump(values, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f'self_games/{model_name}/{nb_simulations}_simu_nb_games.pickle', 'wb') as handle:
             pickle.dump(game_played, handle, protocol=pickle.HIGHEST_PROTOCOL)
-            
+
 
 if __name__ == "__main__":
-    
+
     import tensorflow as tf
     tf.compat.v1.disable_eager_execution()
 
@@ -103,5 +111,3 @@ if __name__ == "__main__":
     self_play(model, "test_numpy", 400, 10, max_move_per_game=150)
 
     board_states, policies, values, nb_games = load_data("test_numpy", 400)
-
-
