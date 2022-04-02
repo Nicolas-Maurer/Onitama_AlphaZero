@@ -81,6 +81,8 @@ Remark: in the Simulation, instead doing a rollout, the value is obtained with t
 # Speed Up
 
 If we want to speed up the generation of games, we should use Numpy and Numba librairies
+The implementation in numpy is done in the dedicated folder, after further investigation, the part taking the most computation time is "model.predict" which can be reduced by disabling tensorflow eager mode
+
 # Sources
 [1] Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm (Silver et al. 2017)  
 [2] Acquisition of Chess Knowledge in AlphaZero (McGrath et al. 2021)  
