@@ -1,6 +1,7 @@
 from NNet_architecture import create_model
 from Numpy_version.MCTS import *
 from Numpy_version.Deck import deck
+from tensorflow.keras.models import load_model
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
@@ -105,9 +106,11 @@ if __name__ == "__main__":
     import tensorflow as tf
     tf.compat.v1.disable_eager_execution()
 
-    model = create_model()
-    # model = load_model("models/model1.h5")
+    # model = create_model()
+    model = load_model("models/test_numpy.h5")
 
-    self_play(model, "test_numpy", 400, 10, max_move_per_game=150)
+    self_play(model, "test_numpy", 800, 10, max_move_per_game=150)
 
-    board_states, policies, values, nb_games = load_data("test_numpy", 400)
+    board_states, policies, values, nb_games = load_data("test_numpy", 800)
+
+# a,b,c,d = load_data("test_numpy", 800)
