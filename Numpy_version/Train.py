@@ -68,8 +68,8 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
 
             i += 1
             print("-----------", i)
-            p.moveTo(500 + 400*(i%2), 500 + 400*(i%2), duration = 0.5)
-            p.press("esc")
+            # p.moveTo(500 + 400*(i%2), 500 + 400*(i%2), duration = 0.5)
+            # p.press("esc")
             
 
         game += 1
