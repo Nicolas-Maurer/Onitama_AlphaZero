@@ -49,7 +49,13 @@ def arena(model1, model2, nb_simulations, max_number_of_move=150):
             index = best_child[1]
             
             # Move to the next child
-            root = [child for child in root_player_1[-1] if child[1] == index][0]
+            if not root[-1]:
+                simulate(root, 1, model1)
+            
+            # root = [child for child in root[-1] if child[1] == index][0]
+            
+            # Only used to play against random model
+            root = root[-1][np.random.randint(len(root[-1]))]
         
         else:
             
@@ -67,7 +73,9 @@ def arena(model1, model2, nb_simulations, max_number_of_move=150):
             index = best_child[1]
             
             # Move to the next child
-            root = [child for child in root_player_2[-1] if child[1] == index][0]
+            if not root[-1]:
+                simulate(root, 1, model2)
+            root = [child for child in root[-1] if child[1] == index][0]
         
         nb_moves += 1
         
@@ -81,10 +89,22 @@ def arena(model1, model2, nb_simulations, max_number_of_move=150):
     else:
         print(f"Player {player} won !")
         return player
-        
+
+import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
 
 model1 = load_model("models/short_model.h5")
 model2 = load_model("models/short_model_2.h5")
 
 
-arena(model1, model2, 1, 50)
+arena(model1, model2, 1, 150)
+
+victories = {0: 0,
+             1: 0,
+            -1: 0}
+
+for i in range(100):
+    victories[arena(model1, model2, 1, 150)] += 1
+    
+
+victories

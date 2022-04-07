@@ -66,8 +66,8 @@ def get_value(state: list) -> int:
 def simulate(state: list, nb_simulation: int, model):
 
     for _ in range(nb_simulation):
-        if _ % 50 == 0:
-            print(_)
+        if (_+1) % 50 == 0:
+            print(_+1)
 
         node_to_expand = state
         search_path = [node_to_expand]
@@ -88,6 +88,8 @@ def simulate(state: list, nb_simulation: int, model):
             expand(node_to_expand, possible_policy)
 
         backpropagate(search_path, value, board_state[0, 0, 9])
+        
+    return select_action()
 
 
 def backpropagate(search_path: list, value: float, to_play: int):
@@ -101,6 +103,19 @@ def backpropagate(search_path: list, value: float, to_play: int):
     for state in reversed(search_path):
         state[3] += value if state[0][0, 0, 9] == to_play else -value
         state[4] += 1
+
+def select_action(state: list) -> list:
+    
+    visit_counts = [(child[4], child[1]) for child in state[-1]]
+    
+    if len(game.history) < config.num_sampling_moves:
+        _, action = softmax_sample(visit_counts)
+    else:
+        _, action = max(visit_counts)
+    return action
+
+def softmax_sample(visit_counts):
+    pass
 
 def pretty_print(state):
 
