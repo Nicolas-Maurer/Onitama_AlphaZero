@@ -1,7 +1,5 @@
 import numpy as np
-import random
 from Numpy_version.Deck import deck
-import numba as nb
 
 def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
     """Return the board state of size 5x5x10
@@ -205,7 +203,7 @@ def is_game_over(board_state: np.array) -> bool:
 def get_reward_for_player(board_state):
 
     if is_game_over(board_state):
-        return -1
+        return 1
     else:
         return None
 

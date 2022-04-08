@@ -1,9 +1,6 @@
-from NNet_architecture import create_model
 from Numpy_version.MCTS import *
 from Numpy_version.Deck import deck
-from tensorflow.keras.models import load_model
 import numpy as np
-import matplotlib.pyplot as plt
 import pickle
 import os
 import pyautogui as p
@@ -16,10 +13,12 @@ def load_data(model_name, nb_simulations):
         policies = pickle.load(handle)
     with open(f'self_games/{model_name}/{nb_simulations}_simu_values.pickle', 'rb') as handle:
         values = pickle.load(handle)
+    with open(f'self_games/{model_name}/{nb_simulations}_simu_terminal_values.pickle', 'rb') as handle:
+        terminal_values = pickle.load(handle)
     with open(f'self_games/{model_name}/{nb_simulations}_simu_nb_games.pickle', 'rb') as handle:
         nb_games = pickle.load(handle)
 
-    return board_states, policies, values, nb_games
+    return board_states, policies, values, terminal_values, nb_games
 
 
 def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_game=np.inf):
@@ -70,10 +69,17 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
 
             i += 1
             print("-----------", i)
-            p.moveTo(500 + 400*(i%2), 500 + 400*(i%2), duration = 0.5)
-            p.press("esc")
+            # p.moveTo(500 + 400*(i%2), 500 + 400*(i%2), duration = 0.5)
+            # p.press("esc")
             
-        game += 1
+        # Backpropagation of the terminal value  
+        if i < max_move_per_game:
+            terminal_values = [1 if _ % 2 == 0 else -1 for _ in range(i)][::-1]
+                
+        else:
+            terminal_values = [0 for _ in range(i)]
+
+        game += 1   
         print("-----------------------------------------",
               game, "-----------------------------------------")
 
@@ -87,12 +93,13 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
         # Add the new generated game, policies, and values to old ones.
         if os.path.exists(f'self_games/{model_name}/{nb_simulations}_simu_board_states.pickle'):
 
-            old_board_states, old_policies, old_values, old_nb_games = load_data(
+            old_board_states, old_policies, old_values, old_terminal_values, old_nb_games = load_data(
                 model_name, nb_simulations)
 
             board_states = old_board_states + board_states
             policies = old_policies + policies
             values = old_values + values
+            terminal_values = old_terminal_values + terminal_values
 
         game_played = old_nb_games + 1
         with open(f'self_games/{model_name}/{nb_simulations}_simu_board_states.pickle', 'wb') as handle:
@@ -101,6 +108,8 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
             pickle.dump(policies, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f'self_games/{model_name}/{nb_simulations}_simu_values.pickle', 'wb') as handle:
             pickle.dump(values, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f'self_games/{model_name}/{nb_simulations}_simu_terminal_values.pickle', 'wb') as handle:
+            pickle.dump(terminal_values, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f'self_games/{model_name}/{nb_simulations}_simu_nb_games.pickle', 'wb') as handle:
             pickle.dump(game_played, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -126,26 +135,3 @@ def softmax_sample(visit_counts :list[int, int]) -> int:
     for i, proba in enumerate(e_x):
         if proba >= p:
             return i
-
-
-if __name__ == "__main__":
-
-    import tensorflow as tf
-    tf.compat.v1.disable_eager_execution()
-
-    # model = create_model()
-    model = load_model("models/test_numpy.h5")
-
-    self_play(model, "test_numpy", 800, 10, max_move_per_game=150)
-
-    board_states, policies, values, nb_games = load_data("test_numpy", 800)
-
-# a,b,c,d = load_data("test_numpy", 800)
-
-# for board in a[-150:]:
-#     plt.matshow(get_board_2D(board))
-#     plt.show()
-    
-# for value in c[-150:]:
-#     print(value)
-    
