@@ -46,12 +46,14 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
         while not is_game_over(node[0]) and i < max_move_per_game:
             simulate(node, nb_simulations, model)
 
-            # Find the best move, i.e the most visited
-            child_visits = [child[4] for child in node[-1]]
-            index = np.argmax(child_visits)
+            # Select the move to play
+            action_index = select_action(node, i)
+            # child_visits = [child[4] for child in node[-1]]
+            # action_index = np.argmax(child_visits)
 
             # MCTS policy
             policy = np.zeros(5 * 5 * 52)
+            child_visits = [child[4] for child in node[-1]]
             total_visits = sum(child_visits)
             for child in node[-1]:
                 policy[child[1]] = child[4]/total_visits
@@ -61,17 +63,16 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
             values.append(get_value(node))
 
             # Go to the next child
-            node = node[-1][index]
+            node = node[-1][action_index]
 
             # plt.imshow(get_board_2D(node[0]))
             # plt.show()
 
             i += 1
             print("-----------", i)
-            # p.moveTo(500 + 400*(i%2), 500 + 400*(i%2), duration = 0.5)
-            # p.press("esc")
+            p.moveTo(500 + 400*(i%2), 500 + 400*(i%2), duration = 0.5)
+            p.press("esc")
             
-
         game += 1
         print("-----------------------------------------",
               game, "-----------------------------------------")
@@ -102,6 +103,29 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
             pickle.dump(values, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f'self_games/{model_name}/{nb_simulations}_simu_nb_games.pickle', 'wb') as handle:
             pickle.dump(game_played, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def select_action(state: list, count: int) -> list:
+    
+    visit_counts = [(child[4], child[1]) for child in state[-1]]
+    
+    if count <= 30:
+        action_index = softmax_sample(visit_counts)
+    else:
+        action_index = visit_counts.index(max(visit_counts))
+    return action_index
+
+
+def softmax_sample(visit_counts :list[int, int]) -> int:
+    
+    visits = [x[0] for x in visit_counts]
+    e_x = np.exp(visits - np.max(visits))
+    e_x = np.cumsum(e_x / e_x.sum())
+    p = np.random.uniform()
+    
+    for i, proba in enumerate(e_x):
+        if proba >= p:
+            return i
 
 
 if __name__ == "__main__":

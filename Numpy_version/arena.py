@@ -6,27 +6,11 @@ from Numpy_version.Deck import deck
 import matplotlib.pyplot as plt
 
 
-def static_init_game(deck: list) -> list:
-
-    init_board_2D = np.array([[-1, -1, -2, -1, -1],
-                              [0,  0,  0,  0,  0],
-                              [0,  0,  0,  0,  0],
-                              [0,  0,  0,  0,  0],
-                              [1,  1,  2,  1,  1]])
-    init_deck = deck
-    init_board_state = get_board_state(init_board_2D, init_deck, 1)
-    # root = [board_state, action, prior, value, number_of_visit, [children]]
-    root = [init_board_state, None, 0, 0, 0, []]
-
-    return root
-
-
-
 def arena(model1, model2, nb_simulations, max_number_of_move=150):
     
     nb_moves = 0
     
-    root = static_init_game(deck[0:5])
+    root = init_game(deck)
         
     while not (is_game_over(root[0]) or nb_moves > max_number_of_move):
         
