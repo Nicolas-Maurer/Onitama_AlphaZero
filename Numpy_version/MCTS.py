@@ -98,7 +98,7 @@ def simulate(state: list, nb_simulation: int, model):
     state = add_exploration_noise(state)
 
     for _ in range(nb_simulation):
-        if (_+1) % 50 == 0:
+        if (_+1) % 100 == 0:
             print(_+1)
 
         node_to_expand = state

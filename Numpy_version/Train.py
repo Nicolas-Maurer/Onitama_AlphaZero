@@ -74,7 +74,7 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
             
         # Backpropagation of the terminal value  
         if i < max_move_per_game:
-            terminal_values = [1 if _ % 2 == 0 else -1 for _ in range(i)][::-1]
+            terminal_values = [-1 if _ % 2 == 0 else 1 for _ in range(i)][::-1]
                 
         else:
             terminal_values = [0 for _ in range(i)]
