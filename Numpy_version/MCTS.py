@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import random
 from Numpy_version.Board import *
 from Numpy_version.Deck import deck
 from NNet_architecture import create_model
@@ -97,7 +98,7 @@ def simulate(state: list, nb_simulation: int, model):
     state = add_exploration_noise(state)
 
     for _ in range(nb_simulation):
-        if (_+1) % 50 == 0:
+        if (_+1) % 100 == 0:
             print(_+1)
 
         node_to_expand = state
@@ -142,23 +143,3 @@ def pretty_print(state):
         print(get_board_2D(child[0]))
         print("Prior: {} Count: {} Value: {}".format(
             child[2], child[4], get_value(child)))
-
-# Goal to beat : 67 seconds for a MCTS with 1000 simulations
-# Without eager mode : 35 seconds for a MCTS with 1000 simulations
-
-# https://stackoverflow.com/questions/62681257/tf-keras-model-predict-is-slower-than-straight-numpy
-# # Disables eager execution
-# tf.compat.v1.disable_eager_execution()
-# print(tf.executing_eagerly())
-
-
-if __name__ == "__main__":
-    from Numpy_version.MCTS import init_game
-    root = init_game(deck)
-    model = create_model()
-    
-    simulate(root, 100, model)
-
-    a = [c[2] for c in root[-1]]
-    a
-    np.sum(a)

@@ -1,7 +1,6 @@
+from cgi import test
 import numpy as np
-import random
 from Numpy_version.Deck import deck
-import numba as nb
 
 def get_board_state(board_2D: np.array, cards: list, player: int) -> np.array:
     """Return the board state of size 5x5x10
@@ -189,11 +188,11 @@ def move(board_state: np.array, action: int) -> np.array:
 
 def is_game_over(board_state: np.array) -> bool:
 
-    # if a king managed to go to the other side
-    if board_state[0, 2, 1] == 1:
+    # if the opponent's king managed to go to the other side
+    if board_state[4, 2, 3] == 1:
         return True
     
-    # if the king is alive return False
+    # if my king is alive return False
     for i in range(5):
         for j in range(5):
             if board_state[i, j, 1] == 1:
@@ -205,7 +204,7 @@ def is_game_over(board_state: np.array) -> bool:
 def get_reward_for_player(board_state):
 
     if is_game_over(board_state):
-        return -1
+        return 1
     else:
         return None
 
