@@ -76,8 +76,6 @@ def self_play(model, model_name, nb_simulations=200, nb_games=2, max_move_per_ga
         if i < max_move_per_game:
             player = node[0][0, 0, 9]
             terminal_values = [-1*player if _ % 2 == 0 else 1*player for _ in range(i)][::-1]
-            print(terminal_values)
-            print(player)
                 
         else:
             terminal_values = [0 for _ in range(i)]
