@@ -211,7 +211,6 @@ def get_reward_for_player(board_state):
 cards_name = ["tiger", "dragon", "frog", "rabbit", "crab", "elephant", "goose",
                 "rooster", "monkey", "mantis", "horse", "ox", "crane", "boar", "eel", "cobra"]
 
-# Transform this 3 variables to nb.Typed.Dict() ?
 layer_code = get_layer_code(deck, cards_name)
 layer_decode = {v: k for k, v in layer_code.items()}
 list_cards = list(zip(deck, cards_name))
