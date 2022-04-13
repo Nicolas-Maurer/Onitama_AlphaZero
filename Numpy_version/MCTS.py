@@ -36,11 +36,11 @@ def expand(state: np.array, possible_policy: list):
                  for i, proba in enumerate(possible_policy) if proba != 0]
 
 
-def get_best_child(state: list, c_param=0.25) -> list:
+def get_best_child(state: list) -> list:
 
     best_score = -np.inf
     best_child = None
-
+    # forcer a visiter au moins une fois chaque noeud ! 
     for child in state[-1]:
         # 19652 and 1.25 come from UCB formula
         pb_c = np.log((state[4] + 19652 + 1) / 19652) + 1.25
@@ -76,11 +76,11 @@ def get_value(state: list) -> int:
         return 0
 
 # At the start of each search, we add dirichlet noise to the prior of the root
-# to encourage the search to explore new actions.
+# to encourage the search to explore new actions. Dir(0.3) is used for chess let's try Dir(0.1)
 def add_exploration_noise(state: list):
 
     priors = [child[2] for child in state[-1]]
-    noise = np.random.gamma(0.3, 1, len(priors))
+    noise = np.random.gamma(0.1, 1, len(priors))
     frac = 0.25
     for i, (p, n) in enumerate(zip(priors, noise)):
         state[-1][i][2] = p * (1 - frac) + n * frac

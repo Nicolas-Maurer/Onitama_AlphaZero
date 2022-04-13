@@ -25,3 +25,17 @@ for board, value, t in zip(board_states[-50:], values[-50:], terminal_values[-50
     plt.title((value, t))
     plt.imshow(get_board_2D(board))
     plt.show()
+
+self_play(short_pseudo, "short_pseudo", nb_simulations= 25, nb_games=1, max_move_per_game=150)
+board_states, policies, values, terminal_values, nb_games = load_data("short_pseudo", 25)
+
+# Game visualization with cards
+for i, (board, value, t) in enumerate(zip(board_states, values, terminal_values)):
+    fig = plt.figure()
+    subfigs = fig.subfigures(1, 2)
+    subfigs.flat[0].subplots(1, 1).imshow(get_board_2D(board))
+    axs = subfigs.flat[1].subplots(2, 1)
+    axs[0].imshow(board[:, :, 4])
+    axs[1].imshow(board[:, :, 5])
+    plt.title((f"Move {i}", round(float(value), 3), t))
+    plt.show()
