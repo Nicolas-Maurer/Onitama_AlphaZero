@@ -23,7 +23,7 @@ def arena(model1, model2, nb_simulations, max_number_of_move=150):
             
             # If the root has not child 
             if not root_player_1[-1]:
-                simulate(root_player_1, 1, model1)
+                simulate(root_player_1, 0, model1)
             
             if nb_simulations:
                 simulate(root_player_1, nb_simulations, model1)
@@ -34,12 +34,12 @@ def arena(model1, model2, nb_simulations, max_number_of_move=150):
             
             # Move to the next child
             if not root[-1]:
-                simulate(root, 1, model1)
+                simulate(root, 0, model1)
             
-            # root = [child for child in root[-1] if child[1] == index][0]
+            root = [child for child in root[-1] if child[1] == index][0]
             
             # Only used to play against random model
-            root = root[-1][np.random.randint(len(root[-1]))]
+            # root = root[-1][np.random.randint(len(root[-1]))]
         
         else:
             
@@ -47,7 +47,7 @@ def arena(model1, model2, nb_simulations, max_number_of_move=150):
             
             # If the root has not child 
             if not root_player_2[-1]:
-                simulate(root_player_2, 1, model2)
+                simulate(root_player_2, 0, model2)
             
             if nb_simulations:
                 simulate(root_player_2, nb_simulations, model2)
@@ -58,7 +58,7 @@ def arena(model1, model2, nb_simulations, max_number_of_move=150):
             
             # Move to the next child
             if not root[-1]:
-                simulate(root, 1, model2)
+                simulate(root, 0, model2)
             root = [child for child in root[-1] if child[1] == index][0]
         
         nb_moves += 1
@@ -77,18 +77,22 @@ def arena(model1, model2, nb_simulations, max_number_of_move=150):
 import tensorflow as tf
 tf.compat.v1.disable_eager_execution()
 
-model1 = load_model("models/short_model.h5")
-model2 = load_model("models/short_model_2.h5")
+model1 = load_model("models/short_pseudo.h5")
+model2 = load_model("models/short_pseudo.h5")
+
+from Numpy_version.test import create_short_model
+model1 = create_short_model()
+model2 = create_short_model()
 
 
-arena(model1, model2, 1, 150)
+arena(model1, model2, 0, 150)
 
 victories = {0: 0,
              1: 0,
             -1: 0}
 
-for i in range(100):
-    victories[arena(model1, model2, 1, 150)] += 1
+for i in range(200):
+    victories[arena(model1, model2, 0, 150)] += 1
     
 
 victories
