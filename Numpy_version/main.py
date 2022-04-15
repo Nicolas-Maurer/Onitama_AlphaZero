@@ -12,15 +12,12 @@ nb_simulations = 50
 
 self_play(short_pseudo, model_name, nb_simulations=nb_simulations, nb_games=200, max_move_per_game=150)
 
-board_states, policies, values, terminal_values, nb_games = load_data(model_name, 50)
+board_states, policies, values, terminal_values, nb_games = load_data(model_name, nb_simulations)
 nb_games
 len(board_states)
 len(policies)
 len(values)
 len(terminal_values)
-
-self_play(short_pseudo, model_name, nb_simulations=25, nb_games=1, max_move_per_game=150)
-board_states, policies, values, terminal_values, nb_games = load_data(model_name, 25)
 
 # Game visualization with cards
 for i, (board, value, t) in enumerate(zip(board_states[-5:], values[-5:], terminal_values[-5:])):
