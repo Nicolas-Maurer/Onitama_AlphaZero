@@ -55,6 +55,8 @@ Some move can be played by different cards but since we need to swap the card pl
 
 So, the output is represented by a 5 x 5 x 52 tensor. 
 
+# Training 
+
 ## Loss
 To be able to train a NN with two head we need a custom loss function. As mentionned in their paper, thye used a loss "that sums over mean-squared error and cross-entropy losses respectively"
 
