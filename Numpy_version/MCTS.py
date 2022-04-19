@@ -80,7 +80,7 @@ def get_value(state: list) -> int:
 def add_exploration_noise(state: list):
 
     priors = [child[2] for child in state[-1]]
-    noise = np.random.gamma(0.1, 1, len(priors))
+    noise = np.random.gamma(0.05, 1, len(priors))
     frac = 0.25
     for i, (p, n) in enumerate(zip(priors, noise)):
         state[-1][i][2] = p * (1 - frac) + n * frac
