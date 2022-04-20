@@ -7,6 +7,14 @@ from NNet_architecture import create_model
 
 
 def init_game(deck: list) -> list:
+    """Initialize a random game from the cards in the deck
+
+    Args:
+        deck (list): list of the cards
+
+    Returns:
+        list: Initial state of the game [board_state, action, prior, value, number_of_visit, [children]]
+    """
 
     init_board_2D = np.array([[-1, -1, -2, -1, -1],
                               [0,  0,  0,  0,  0],
@@ -22,8 +30,13 @@ def init_game(deck: list) -> list:
 
 
 def expand(state: np.array, possible_policy: list):
-    """ Expand the node with all children with a positive probability, 
-        the policy is obtained by the nn"""
+    """Expand the node with all children with a positive probability, 
+        the policy is obtained by the nn
+
+    Args:
+        state (np.array): State of the game
+        possible_policy (list): List of possible moves, after filtering out illegal ones
+    """
 
     board_state = state[0]
 
